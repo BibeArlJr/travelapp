@@ -1,6 +1,5 @@
 platform :ios, '13.0'
 
-# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
 project 'Runner', {
@@ -9,26 +8,35 @@ project 'Runner', {
   'Release' => :release,
 }
 
-def flutter_root
-  generated_xcode_build_settings_path = File.expand_path(File.join(__dir__, 'Flutter', 'Generated.xcconfig'))
-  unless File.exist?(generated_xcode_build_settings_path)
-    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
-  end
+# SAFELY LOAD flutter_root
+generated_xcode_build_settings_path = File.expand_path(File.join(__dir__, 'Flutter', 'Generated.xcconfig'))
 
-  File.foreach(generated_xcode_build_settings_path) do |line|
-    matches = line.match(/FLUTTER_ROOT\=(.*)/)
-    return matches[1].strip if matches
-  end
-  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting the file and running flutter pub get again."
+unless File.exist?(generated_xcode_build_settings_path)
+  raise "#{generated_xcode_build_settings_path} must exist. Run 'flutter pub get' first or let CI create it."
 end
 
-require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+flutter_root = nil
+File.foreach(generated_xcode_build_settings_path) do |line|
+  matches = line.match(/FLUTTER_ROOT\=(.*)/)
+  flutter_root = matches[1].strip if matches
+end
+
+unless flutter_root
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}"
+end
+
+# SAFELY LOAD podhelper
+podhelper_path = File.expand_path(File.join(flutter_root, 'packages', 'flutter_tools', 'bin', 'podhelper.rb'))
+unless File.exist?(podhelper_path)
+  raise "Flutter podhelper not found at #{podhelper_path}"
+end
+
+require podhelper_path
 
 flutter_ios_podfile_setup
 
 target 'Runner' do
   use_frameworks!
   use_modular_headers!
-
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 end
