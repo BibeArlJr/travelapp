@@ -1,16 +1,10 @@
-# Uncomment this line to define a global platform for your project
 platform :ios, '13.0'
 
-# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
-ENV['COCOAPODS_DISABLE_STATS'] = 'true'
-
-require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), __dir__)
+use_frameworks!
+use_modular_headers!
 
 target 'Runner' do
-  use_frameworks!
-  use_modular_headers!
-
-  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  flutter_install_all_ios_pods(File.dirname(File.realpath(__FILE__)))
 end
 
 post_install do |installer|
@@ -19,4 +13,15 @@ post_install do |installer|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
     end
   end
+end
+
+def flutter_install_all_ios_pods(ios_project_path)
+  generated_xcconfig_path = File.join(ios_project_path, 'Flutter', 'Generated.xcconfig')
+  if !File.exist?(generated_xcconfig_path)
+    raise "Generated.xcconfig must exist to install pods. Run 'flutter pub get' first."
+  end
+
+  flutter_root = ENV['FLUTTER_ROOT'] || raise("FLUTTER_ROOT not set")
+  podfile_tools = File.join(flutter_root, 'packages', 'flutter_tools', 'bin', 'podhelper.rb')
+  eval(File.read(podfile_tools), binding)
 end
