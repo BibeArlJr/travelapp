@@ -49,5 +49,6 @@ jobs:
         echo "FLUTTER_BUILD_MODE=release" >> $GITHUB_ENV
         echo "SYMROOT=${{ github.workspace }}/build" >> $GITHUB_ENV
 
-    - name: Build iOS App (no codesign)
-      run: flutter build ios --release --no-codesign --verbose
+    - name: Build iOS App (no codesign, verbose)
+      run: "flutter build ios --release --no-codesign -v"
+      
