@@ -27,8 +27,10 @@ jobs:
     - name: Get Flutter dependencies
       run: flutter pub get
 
-    - name: Generate iOS build settings
-      run: flutter build ios --simulator --no-codesign
+    - name: Generate xcconfig (iOS build settings)
+      run: |
+        flutter create .
+        # This will regenerate ios/ and Flutter/Generated.xcconfig if it's missing
 
     - name: Install CocoaPods
       run: |
