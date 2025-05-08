@@ -4,7 +4,13 @@ use_frameworks!
 use_modular_headers!
 
 target 'Runner' do
-  flutter_install_all_ios_pods(File.dirname(File.realpath(__FILE__)))
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+end
+
+# Workaround: define the missing method inline
+def flutter_install_all_ios_pods(ios_project_path)
+  flutter_application_path = File.expand_path('..', __dir__)
+  load File.join(flutter_application_path, '.flutter-plugins-dependencies')
 end
 
 post_install do |installer|
@@ -13,15 +19,4 @@ post_install do |installer|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
     end
   end
-end
-
-def flutter_install_all_ios_pods(ios_project_path)
-  generated_xcconfig_path = File.join(ios_project_path, 'Flutter', 'Generated.xcconfig')
-  if !File.exist?(generated_xcconfig_path)
-    raise "Generated.xcconfig must exist to install pods. Run 'flutter pub get' first."
-  end
-
-  flutter_root = ENV['FLUTTER_ROOT'] || raise("FLUTTER_ROOT not set")
-  podfile_tools = File.join(flutter_root, 'packages', 'flutter_tools', 'bin', 'podhelper.rb')
-  eval(File.read(podfile_tools), binding)
 end
