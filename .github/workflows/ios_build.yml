@@ -27,14 +27,14 @@ jobs:
     - name: Get Flutter dependencies
       run: flutter pub get
 
-    - name: Run flutter build to generate iOS configs
-      run: flutter build ios --no-codesign
+    - name: Generate iOS build settings
+      run: flutter build ios --simulator --no-codesign
 
-    - name: Run CocoaPods install
+    - name: Install CocoaPods
       run: |
         cd ios
         pod install
+        cd ..
 
-    # Optional: Repeat the build step if you want to build again after pod install
     - name: Final iOS Build (no codesign)
       run: flutter build ios --release --no-codesign
