@@ -1,12 +1,11 @@
-# ios/Podfile
-
 platform :ios, '13.0'
 
 use_frameworks!
 use_modular_headers!
 
 target 'Runner' do
-  flutter_install_all_ios_pods(File.dirname(File.realpath(__FILE__)))
+  install_flutter_engine_pod
+  install_flutter_plugin_pods(File.dirname(File.realpath(__FILE__)))
 end
 
 post_install do |installer|
