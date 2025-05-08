@@ -1,0 +1,22 @@
+platform :ios, '13.0'
+
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+
+  # Flutter installed plugins
+  install_all_flutter_pods(File.dirname(File.realpath(__FILE__)))
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+    end
+  end
+end
+
+def install_all_flutter_pods(app_path)
+  flutter_root = File.expand_path('..', app_path)
+  load File.join(flutter_root, '.flutter-plugins-dependencies')
+end
