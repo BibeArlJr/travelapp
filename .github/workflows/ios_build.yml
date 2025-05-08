@@ -21,17 +21,20 @@ jobs:
         flutter-version: '3.29.3'
         channel: stable
 
-    - name: Get dependencies
+    - name: Precache iOS artifacts
+      run: flutter precache --ios
+
+    - name: Get Flutter dependencies
       run: flutter pub get
 
-    - name: Precache and prepare iOS build
-      run: flutter precache && flutter build ios --no-codesign
+    - name: Run flutter build to generate iOS configs
+      run: flutter build ios --no-codesign
 
-    - name: Set up CocoaPods
+    - name: Run CocoaPods install
       run: |
         cd ios
         pod install
-        cd ..
 
-    - name: Final Build iOS (no codesign)
+    # Optional: Repeat the build step if you want to build again after pod install
+    - name: Final iOS Build (no codesign)
       run: flutter build ios --release --no-codesign
