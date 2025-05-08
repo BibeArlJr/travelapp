@@ -13,7 +13,8 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
     - name: Install Flutter
       uses: subosito/flutter-action@v2
@@ -21,22 +22,32 @@ jobs:
         flutter-version: '3.29.3'
         channel: stable
 
-    - name: Precache iOS artifacts
+    - name: Precache Flutter iOS artifacts
       run: flutter precache --ios
 
-    - name: Get Flutter dependencies
+    - name: Install Flutter dependencies
       run: flutter pub get
 
-    - name: Generate xcconfig (iOS build settings)
+    - name: Ensure Generated.xcconfig exists
       run: |
-        flutter create .
-        # This will regenerate ios/ and Flutter/Generated.xcconfig if it's missing
+        mkdir -p ios/Flutter
+        touch ios/Flutter/Generated.xcconfig
 
-    - name: Install CocoaPods
+    - name: Clean CocoaPods and reinstall
       run: |
         cd ios
+        rm -rf Pods Podfile.lock
+        pod repo update
         pod install
         cd ..
 
-    - name: Final iOS Build (no codesign)
-      run: flutter build ios --release --no-codesign
+    - name: Flutter clean and rebuild environment
+      run: flutter clean && flutter pub get && flutter precache --ios
+
+    - name: Set Flutter iOS build environment
+      run: |
+        echo "FLUTTER_BUILD_MODE=release" >> $GITHUB_ENV
+        echo "SYMROOT=${{ github.workspace }}/build" >> $GITHUB_ENV
+
+    - name: Build iOS App (no codesign)
+      run: flutter build ios --release --no-codesign --verbose
